@@ -1,0 +1,15 @@
+---
+
+lvm:
+- {vg: novo, lv: groot, size: 2g, path: /groot }
+- {vg: novo, lv: outro, size: 1g , path: /outro }
+
+pv: /dev/sdc
+filesystem: xfs
+#vg: rl
+#a must to extend current vg
+#old_device: /dev/sda2
+
+
+
+

@@ -1,0 +1,12 @@
+---
+
+lvm:
+- {vg: rl, lv: groot, size: +1g }
+- {vg: rl, lv: outro, size: 1g }
+- {vg: rl, lv: root, size: +2g }
+pv_pv: /dev/sdb
+vg_vg: rl
+#a must to extend current vg
+old_device: /dev/sda2,/dev/sdc
+
+

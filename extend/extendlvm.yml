@@ -1,0 +1,25 @@
+
+---
+- name: LVM extend...
+  vars_files:
+    - ex.yml  
+  hosts: lvm
+  gather_facts: no
+  become: true
+
+
+  tasks:
+
+    - name: extend volume group to the maximum possible
+      community.general.lvg:
+        vg: "{{vg_vg}}"
+        pvs: "{{ pv_pv }},{{ old_device }}"
+        pvresize: yes
+        
+    - name: Extend LVM logical volumes
+      lvol:
+        vg: "{{item.vg}}"
+        lv: "{{item.lv}}"
+        size: "{{item.size}}"
+        resizefs: yes
+      with_items: "{{ lvm }}"

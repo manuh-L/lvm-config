@@ -1,0 +1,45 @@
+
+---
+- name: Create FS
+  vars_files:
+    - fs_intput.yml
+  hosts: lvm
+  gather_facts: no
+  become: true
+
+
+  tasks:
+
+    - name: Create volume group to the maximum possible
+      community.general.lvg:
+        vg: "{{item.vg}}"
+        pvs: "{{ pv }}"
+        pvresize: yes
+      with_items: "{{ lvm }}"
+
+    - name: configure LVM logical volumes
+      lvol:
+        vg: "{{item.vg}}"
+        lv: "{{item.lv}}"
+        size: "{{item.size}}"
+        pvs: "{{ pv }}"
+        resizefs: yes
+      with_items: "{{ lvm }}"
+
+
+    - name: Create fs
+      community.general.filesystem:
+        fstype: "{{ filesystem }}"
+        dev: "/dev/{{ item.vg }}/{{ item.lv }}"
+        resizefs: yes
+        state: present
+      with_items: "{{ lvm }}"
+
+
+    - name: mount fs
+      ansible.posix.mount:
+        path: "{{ item.path }}"
+        src: "/dev/{{ item.vg }}/{{ item.lv }}"
+        fstype: "{{ filesystem }}"
+        state: mounted
+      with_items: "{{ lvm }}"
