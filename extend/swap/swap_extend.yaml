@@ -1,0 +1,70 @@
+---
+- name: Swap extend...
+  vars_files:
+    - ex_input.yml  
+  hosts: lvm
+  gather_facts: no
+  become: true
+
+  tasks:
+
+#    - name: create partition
+#      community.general.parted:
+#        device: "{{ device }}"
+#        number: "{{ part_number }}"
+#        pvresize: yes
+
+
+    - name: Read device information (always use unit when probing)
+      community.general.parted: "device={{ part_to_extended }} unit=GiB"
+      register: sda_info
+
+
+    - name: Print return information from the previous task
+      ansible.builtin.debug:
+        var: sda_info    
+        
+
+    - name: Extend an existing partition to fill all available space
+      community.general.parted:
+        device: "{{ device }}"
+        number: "{{ part_number }}"
+        part_end: "100%"
+        resize: true
+        state: present
+
+    - name: Extend volume group to the maximum possible
+      community.general.lvg:
+        vg: "{{vg_vg}}"
+        pvs: "{{ pv }},{{ old_device }}"
+        pvresize: yes
+
+    - name: disable swap
+      shell: swapoff -v "{{ swap }}"
+
+
+    - name: Extend swap lvm
+      lvol:
+        vg: "{{item.vg}}"
+        lv: "{{item.lv}}"
+        size: "{{item.size}}"
+      with_items: "{{ lvm }}"
+
+
+ #   - name: extend swap to the maximum available size
+ #     shell: lvextend -l +100%free "{{ swap }}"
+
+##    - name: format swap
+##      shell: mkswap "{{ swap }}"
+
+#    - name: create swap lvm
+#      community.general.filesystem:
+#      dev: "{{ swap }}"
+#      resizefs: true
+
+ #   - name: disable swap
+ #     shell: mkswap "{{ swap }}"
+
+    - name: enable swap
+      shell: swapon -v "{{ swap }}"
+
