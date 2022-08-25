@@ -1,0 +1,7 @@
+[lvm]
+172.16.42.133
+[lvm:vars]
+ansible_user= root
+ansible_password=Password1
+ansible_become_user=root
+ansible_become_password=Password1
