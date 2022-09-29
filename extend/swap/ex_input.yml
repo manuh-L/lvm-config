@@ -1,14 +1,13 @@
 ---
 
 lvm:
-- {vg: rl, lv: swap, size: +100%FREE }
-pv: /dev/sdb
-vg_vg: rl
-#a must to extend current vg
+- {vg: vg_osbase, lv: lv_swap, size: 8g }
+pv: /dev/sda2
+vg_vg: vg_osbase
+#partition containing the lvm
 old_device: /dev/sda2
 #swap lvm
-swap: /dev/rl/swap
-
+swap: /dev/vg_osbase/lv_swap
 device: /dev/sda
 #partition to be extend to the maximum size
 part_to_extended: /dev/sda2
